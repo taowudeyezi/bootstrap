@@ -70,6 +70,74 @@ $('#myModal').on('show.bs.modal', function (e) {
 })
 {% endhighlight %}
 
+<h2 id="js-sanitizer">Sanitizer</h2>
+
+<p>Tooltips and Popovers use our built-in sanitizer to sanitize options which accept HTML.</p>
+
+<p>The default <code>whiteList</code> value is the following:</p>
+
+{% highlight js %}
+var ARIA_ATTRIBUTE_PATTERN = /^aria-[\w-]*$/i
+var DefaultWhitelist = {
+  // Global attributes allowed on any supplied element below.
+  '*': ['class', 'dir', 'id', 'lang', 'role', ARIA_ATTRIBUTE_PATTERN],
+  a: ['target', 'href', 'title', 'rel'],
+  area: [],
+  b: [],
+  br: [],
+  col: [],
+  code: [],
+  div: [],
+  em: [],
+  hr: [],
+  h1: [],
+  h2: [],
+  h3: [],
+  h4: [],
+  h5: [],
+  h6: [],
+  i: [],
+  img: ['src', 'alt', 'title', 'width', 'height'],
+  li: [],
+  ol: [],
+  p: [],
+  pre: [],
+  s: [],
+  small: [],
+  span: [],
+  sub: [],
+  sup: [],
+  strong: [],
+  u: [],
+  ul: []
+}
+{% endhighlight %}
+
+<p>If you want to add new values to this default <code>whiteList</code> you can do the following:</p>
+
+{% highlight js %}
+var myDefaultWhiteList = $.fn.tooltip.Constructor.Default.whiteList
+
+// To allow table elements
+myDefaultWhiteList.table = []
+
+// To allow td elements and data-option attributes on td elements
+myDefaultWhiteList.td = ['data-option']
+
+// You can push your custom regex to validate your attributes.
+// Be careful about your regular expressions being too lax
+var myCustomRegex = /^data-my-app-[\w-]+/
+myDefaultWhiteList['*'].push(myCustomRegex)
+{% endhighlight %}
+If you want to bypass our sanitizer because you prefer to use a dedicated library, for example [DOMPurify](https://www.npmjs.com/package/dompurify), you should do the following:
+{% highlight js %}
+$('#yourTooltip').tooltip({
+  sanitizeFn: function (content) {
+    return DOMPurify.sanitize(content)
+  }
+})
+{% endhighlight %}
+
   <h2 id="js-version-nums">Version numbers</h2>
   <p>The version of each of Bootstrap's jQuery plugins can be accessed via the <code>VERSION</code> property of the plugin's constructor. For example, for the tooltip plugin:</p>
 {% highlight js %}
