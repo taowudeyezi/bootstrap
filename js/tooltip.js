@@ -76,16 +76,16 @@
   function allowedAttribute(attr, allowedAttributeList) {
     var attrName = attr.nodeName.toLowerCase()
 
-    if (allowedAttributeList.indexOf(attrName) !== -1) {
-      if (uriAttrs.indexOf(attrName) !== -1) {
+    if ($.inArray(attrName, allowedAttributeList) !== -1) {
+      if ($.inArray(attrName , uriAttrs) !== -1) {
         return Boolean(attr.nodeValue.match(SAFE_URL_PATTERN) || attr.nodeValue.match(DATA_URL_PATTERN))
       }
 
       return true
     }
 
-    var regExp = allowedAttributeList.filter(function (attrRegex) {
-      return attrRegex instanceof RegExp
+    var regExp = $(allowedAttributeList).filter(function (index, value) {
+      return value instanceof RegExp
     })
 
     // Check if a regular expression validates the attribute.
@@ -107,22 +107,21 @@
       return sanitizeFn(unsafeHtml)
     }
 
-    var domParser = new window.DOMParser()
-    var createdDocument = domParser.parseFromString(unsafeHtml, 'text/html')
     var whitelistKeys = $.map(whiteList, function (el, i) { return i })
-    var elements = [].slice.call($(createdDocument.body).find('*'))
+    var parsedHtml = $.parseHTML('<div>' + unsafeHtml + '</div>')
+    var elements = parsedHtml.concat([].slice.call($(parsedHtml).find('*')))
 
     for (var i = 0, len = elements.length; i < len; i++) {
       var el = elements[i]
       var elName = el.nodeName.toLowerCase()
 
-      if (whitelistKeys.indexOf(el.nodeName.toLowerCase()) === -1) {
+      if ($.inArray(elName, whitelistKeys) === -1) {
         el.parentNode.removeChild(el)
 
         continue
       }
 
-      var attributeList = [].slice.call(el.attributes)
+      var attributeList = $.map(el.attributes, function (el) { return el })
       var whitelistedAttributes = [].concat(whiteList['*'] || [], whiteList[elName] || [])
 
       for (var j = 0, len2 = attributeList.length; j < len2; j++) {
@@ -132,7 +131,7 @@
       }
     }
 
-    return createdDocument.body.innerHTML
+    return elements[0].innerHTML
   }
 
   // TOOLTIP PUBLIC CLASS DEFINITION
@@ -214,7 +213,7 @@
     var dataAttributes = this.$element.data()
 
     for (var dataAttr in dataAttributes) {
-      if (dataAttributes.hasOwnProperty(dataAttr) && DISALLOWED_ATTRIBUTES.indexOf(dataAttr) !== -1) {
+      if (dataAttributes.hasOwnProperty(dataAttr) && $.inArray(dataAttr, DISALLOWED_ATTRIBUTES) !== -1) {
         delete dataAttributes[dataAttr]
       }
     }

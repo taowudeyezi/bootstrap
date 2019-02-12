@@ -57,7 +57,7 @@
       }
 
       $tip.find('.popover-title').html(title)
-      $tip.find('.popover-content').children().detach().end().html()[
+      $tip.find('.popover-content').children().detach().end()[
         typeContent === 'string' ? 'html' : 'append'
       ](content)
     } else {
