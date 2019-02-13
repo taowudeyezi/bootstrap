@@ -107,9 +107,13 @@
       return sanitizeFn(unsafeHtml)
     }
 
+    var createdDocument = document.implementation.createHTMLDocument('sanitization')
+    createdDocument.body.innerHTML = unsafeHtml
+
     var whitelistKeys = $.map(whiteList, function (el, i) { return i })
-    var parsedHtml = $.parseHTML('<div>' + unsafeHtml + '</div>')
-    var elements = parsedHtml.concat([].slice.call($(parsedHtml).find('*')))
+    // var parsedHtml = $.parseHTML('<div>' + unsafeHtml + '</div>')
+    // var elements = parsedHtml.concat([].slice.call($(parsedHtml).find('*')))
+    var elements = $(createdDocument.body).find('*')
 
     for (var i = 0, len = elements.length; i < len; i++) {
       var el = elements[i]
@@ -131,7 +135,8 @@
       }
     }
 
-    return elements[0].innerHTML
+    // return elements[0].innerHTML
+    return createdDocument.body.innerHTML
   }
 
   // TOOLTIP PUBLIC CLASS DEFINITION
